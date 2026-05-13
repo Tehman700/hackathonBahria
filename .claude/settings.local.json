@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"D:\\\\LMS Hackathon\\\\CogniPath\\\\CogniPathLMS\" -Recurse -Force)",
+      "Bash(Select-Object -First 100)",
+      "Bash(Format-Table -Property FullName)",
+      "Bash(grep -E \"^D:\\\\\\\\LMS Hackathon\\\\\\\\CogniPath\\\\\\\\CogniPathLMS\\\\\\\\\\(client|server\\)\")",
+      "Bash(Select-Object -First 10)",
+      "PowerShell(\\(Get-ChildItem \"d:\\\\LMS Hackathon\" -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum\\).Sum / 1MB)",
+      "PowerShell(cmd /c \"rd /s /q \"\"d:\\\\LMS Hackathon\\\\moodle_LMS\\\\moodle\\\\.git\"\"\")",
+      "PowerShell(if \\($LASTEXITCODE -eq 0\\) { \"Deleted\" } else { \"Failed - try closing VS Code file explorer on that folder\" })"
+    ]
+  }
+}

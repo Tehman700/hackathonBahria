@@ -1,0 +1,26 @@
+# Các file môi trường nhạy cảm
+.env
+.env.local
+.env.*.local
+*.env
+
+# Thư mục ảo Python
+__pycache__/
+*.py[cod]
+
+# File rác hệ thống
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Cấu hình IDE
+.vscode/
+*.swp
+*.swo
+
+# Các file quyền truy cập nhạy cảm
+serviceAccountKey.json
+*.pem
+*.key
+*.cert

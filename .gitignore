@@ -1,0 +1,39 @@
+# Environment / secrets — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Docker
+*.log
