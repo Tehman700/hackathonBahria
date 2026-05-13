@@ -26,7 +26,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         pdo_mysql \
         zip \
         soap \
-        xmlrpc \
         xsl \
         mbstring \
         exif \
