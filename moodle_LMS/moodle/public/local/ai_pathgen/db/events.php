@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details for local_ai_pathgen.
+ * Event observers for local_ai_pathgen.
  *
  * @package    local_ai_pathgen
  * @copyright  2026 Atomcamp
@@ -24,8 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_ai_pathgen';
-$plugin->version = 2026051301;
-$plugin->requires = 2026041000;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '0.1.0';
+$observers = [
+    [
+        'eventname' => '\core\event\user_created',
+        'callback' => 'local_ai_pathgen_observer_user_created',
+    ],
+];

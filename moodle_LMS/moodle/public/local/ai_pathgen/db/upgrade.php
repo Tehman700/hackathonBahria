@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details for local_ai_pathgen.
+ * Upgrade script for local_ai_pathgen.
  *
  * @package    local_ai_pathgen
  * @copyright  2026 Atomcamp
@@ -24,8 +24,27 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_ai_pathgen';
-$plugin->version = 2026051301;
-$plugin->requires = 2026041000;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '0.1.0';
+/**
+ * Upgrade hook.
+ *
+ * @param int $oldversion
+ * @return bool
+ */
+function xmldb_local_ai_pathgen_upgrade(int $oldversion): bool {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2026051301) {
+        $table = new xmldb_table('local_ai_pathgen');
+        $field = new xmldb_field('interests', XMLDB_TYPE_TEXT, null, null, null, null, null, 'goal');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026051301, 'local', 'ai_pathgen');
+    }
+
+    return true;
+}

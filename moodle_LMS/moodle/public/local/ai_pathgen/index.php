@@ -37,12 +37,13 @@ $PAGE->set_title(get_string('pageheading', 'local_ai_pathgen'));
 $PAGE->set_heading(get_string('pageheading', 'local_ai_pathgen'));
 
 $goal = optional_param('goal', get_user_preferences('local_ai_pathgen_goal', ''), PARAM_TEXT);
+$interests = optional_param('interests', get_user_preferences('local_ai_pathgen_interests', ''), PARAM_TEXT);
 $skills = optional_param('skills', get_user_preferences('local_ai_pathgen_skills', ''), PARAM_TEXT);
 $submitted = optional_param('submitpathgen', 0, PARAM_BOOL);
 
 if ($submitted && confirm_sesskey()) {
-    $pathitems = local_ai_pathgen_generate_path_mock($goal, $skills);
-    local_ai_pathgen_save_generated_path((int)$USER->id, $goal, $skills, $pathitems);
+    $pathitems = local_ai_pathgen_generate_path_mock($goal, $skills, $interests);
+    local_ai_pathgen_save_generated_path((int)$USER->id, $goal, $skills, $interests, $pathitems);
     redirect($url, get_string('saved', 'local_ai_pathgen'), 0, \core\output\notification::NOTIFY_SUCCESS);
 }
 
@@ -64,6 +65,10 @@ echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', '
 echo html_writer::start_div('mb-3');
 echo html_writer::tag('label', get_string('goal', 'local_ai_pathgen'), ['for' => 'id_goal', 'class' => 'form-label']);
 echo html_writer::tag('textarea', s($goal), ['name' => 'goal', 'id' => 'id_goal', 'rows' => 3, 'class' => 'form-control']);
+echo html_writer::end_div();
+echo html_writer::start_div('mb-3');
+echo html_writer::tag('label', get_string('interests', 'local_ai_pathgen'), ['for' => 'id_interests', 'class' => 'form-label']);
+echo html_writer::tag('textarea', s($interests), ['name' => 'interests', 'id' => 'id_interests', 'rows' => 3, 'class' => 'form-control']);
 echo html_writer::end_div();
 echo html_writer::start_div('mb-3');
 echo html_writer::tag('label', get_string('skills', 'local_ai_pathgen'), ['for' => 'id_skills', 'class' => 'form-label']);

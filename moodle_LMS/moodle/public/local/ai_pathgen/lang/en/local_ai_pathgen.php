@@ -26,11 +26,15 @@ $string['pluginname'] = 'AI Learning Path Generator';
 $string['navlabel'] = 'AI Learning Path';
 $string['pageheading'] = 'AI Learning Path Generator';
 $string['goal'] = 'Learning goal';
+$string['interests'] = 'Learning interests';
 $string['skills'] = 'Current skills/background';
 $string['generate'] = 'Generate personalized path';
 $string['latestpath'] = 'Latest generated learning path';
 $string['mocknotice'] = 'API mode: mocked `/api/generate-path` response for scaffold testing.';
 $string['saved'] = 'Personalized learning path saved to your profile preferences and plugin log.';
 $string['nopathyet'] = 'No learning path generated yet.';
+$string['onboardingsurvey'] = 'Onboarding survey (for AI personalization)';
+$string['onboardinggoal'] = 'What is your main learning goal?';
+$string['onboardinginterests'] = 'What topics are you most interested in?';
+$string['onboardingskills'] = 'What is your current knowledge/skills level?';
 $string['privacy:metadata'] = 'Stores generated learning path scaffolding data.';
-
