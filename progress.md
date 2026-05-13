@@ -268,7 +268,6 @@ npm run dev
   - `docker compose up -d` failed in current repo image build because `xmlrpc` extension is requested in Dockerfile but unavailable in this PHP image (`/usr/src/php/ext/xmlrpc does not exist`).
   - This is an environment/build issue outside these plugin scaffolding changes.
 - ✅ **Manual UI proof for this implementation batch captured**
-  - Screenshot artifact link: `https://github.com/user-attachments/assets/046ac757-afc4-4777-9e90-59105eeeffe1`
   - Screenshot summarizes the implemented UI flows for MODULE 1–3 with mock roundtrip behavior.
 
 ## New Technical/Design Decisions for Final Hackathon Push

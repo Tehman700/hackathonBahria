@@ -60,7 +60,15 @@ if ($submitted && confirm_sesskey()) {
     redirect($url, get_string('saved', 'local_ai_quizgen'), 0, \core\output\notification::NOTIFY_SUCCESS);
 }
 
-$latest = $DB->get_record('local_ai_quizgen', ['userid' => $USER->id, 'courseid' => $courseid], '*', IGNORE_MULTIPLE);
+$latestrecords = $DB->get_records(
+    'local_ai_quizgen',
+    ['userid' => $USER->id, 'courseid' => $courseid],
+    'timemodified DESC',
+    '*',
+    0,
+    1
+);
+$latest = $latestrecords ? reset($latestrecords) : false;
 if ($latest && !empty($latest->generatedquiz)) {
     $decoded = json_decode($latest->generatedquiz, true);
     if (is_array($decoded)) {

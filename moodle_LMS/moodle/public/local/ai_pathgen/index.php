@@ -46,7 +46,8 @@ if ($submitted && confirm_sesskey()) {
     redirect($url, get_string('saved', 'local_ai_pathgen'), 0, \core\output\notification::NOTIFY_SUCCESS);
 }
 
-$latest = $DB->get_record('local_ai_pathgen', ['userid' => $USER->id], '*', IGNORE_MULTIPLE);
+$latestrecords = $DB->get_records('local_ai_pathgen', ['userid' => $USER->id], 'timemodified DESC', '*', 0, 1);
+$latest = $latestrecords ? reset($latestrecords) : false;
 $latestitems = [];
 if ($latest && !empty($latest->generatedpath)) {
     $decoded = json_decode($latest->generatedpath, true);
