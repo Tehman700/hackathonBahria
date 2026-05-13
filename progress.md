@@ -1,203 +1,235 @@
 # AtomCamp Smart Adaptive LMS — Project Progress
 
-## What We're Building
+## Project Strategy
 
-A **unified Smart Adaptive LMS** for AtomCamp (AUREX 26 Hackathon).
+**Main LMS: Moodle 5.2** (the full-featured, production-grade LMS platform)
 
-We started with two open-source projects:
-- **CogniPath** — AI-powered personalized learning path generator (React + Flask + Gemini)
-- **Moodle** — Full-featured LMS reference (PHP, not running separately)
+**Secondary: CogniPath** (AI engine — selected features from it will be integrated INTO Moodle)
 
-**Merge strategy:** CogniPath is the live application. We are building all missing LMS features (quizzes, analytics, instructor dashboard, adaptive engine) **directly into CogniPath**, using Moodle's architecture as the feature reference. Moodle is NOT run as a separate server.
+### Why Moodle as the core?
+Moodle already has everything a real LMS needs out of the box:
+- Course & content management
+- Quiz & assessment engine
+- Gradebook & progress tracking
+- User roles (student, teacher, admin)
+- Discussion forums
+- Certificates of completion
+- Enrollment management
+- Calendar & scheduling
+- Reporting & analytics
+
+### What we're adding from CogniPath
+CogniPath brings the AI-adaptive layer that Moodle lacks. We are integrating these CogniPath features into Moodle as custom plugins/blocks:
+
+| CogniPath Feature | Integration into Moodle |
+|---|---|
+| AI Learning Path Generator | Moodle plugin: auto-generates a personalized course sequence for each student |
+| Socratic AI Tutor Chat | Moodle block: per-course AI chatbot that uses course content as context |
+| AI Lesson Content Generator | Moodle plugin: generates lesson summaries and explanations from course material |
+| AI Quiz Generator | Moodle plugin: auto-generates MCQ questions from lesson content |
+| Adaptive Difficulty Engine | Moodle plugin: adjusts next content recommendation based on quiz scores |
+| AI Progress Insights | Moodle dashboard block: instructor view of struggling students with AI suggestions |
+
+### Integration Architecture
+
+```
+[ Moodle LMS (PHP + Apache + MySQL) ]   <-- Main application
+        |
+        | REST API calls
+        v
+[ Flask AI Backend (Python + Gemini) ]  <-- CogniPath's AI engine
+        |
+        | Gemini 2.5 Flash
+        v
+[ Google Gemini API ]
+```
 
 ---
 
-## Tech Stack (Unified App)
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19 + TypeScript + Vite + Tailwind CSS |
-| Backend | Python Flask + Gunicorn |
-| AI Engine | Google Gemini 2.5 Flash (path gen, chat, quizzes) |
-| Storage | localStorage (browser) — no DB required to run |
-| Auth | Local auto-login (no Firebase needed) |
-| Routing | React Router DOM v7 |
+| Main LMS | Moodle 5.2 (PHP 8.2 + Apache) |
+| LMS Database | MySQL 8.0 |
+| AI Backend | Python Flask + Gemini 2.5 Flash (from CogniPath) |
+| AI Model | Google Gemini 2.5 Flash Lite |
+| Containerization | Docker + Docker Compose |
+| Custom Plugins | PHP (Moodle plugin API) |
 
 ---
 
-## Run Commands
+## How to Run
 
 ### Prerequisites
-- Node.js v18+
-- Python 3.9+
-- A **Gemini API Key** from https://aistudio.google.com/apikey
+- Docker Desktop running
+- A Gemini API Key from https://aistudio.google.com/apikey
 
-### Step 1 — Add your Gemini API key
-Edit `CogniPath/CogniPathLMS/server/.env`:
+---
+
+### Run Moodle (Main LMS)
+
+```powershell
+cd "d:\LMS Hackathon\moodle_LMS"
+docker-compose build
+docker-compose up -d
+```
+
+Open **http://localhost:8090** → follow the install wizard.
+
+**DB credentials for install wizard:**
+| Field | Value |
+|---|---|
+| Database host | `moodledb` |
+| Database name | `moodle` |
+| Database user | `moodle` |
+| Database password | `moodle123` |
+| Moodle data directory | `/var/moodledata` |
+
+---
+
+### Run CogniPath AI Backend (Flask API)
+
+```powershell
+cd "d:\LMS Hackathon\CogniPath\CogniPathLMS\server"
+venv\Scripts\activate          # first time: python -m venv venv && pip install -r requirements.txt
+python run.py
+# Runs at http://localhost:8080
+```
+
+Add your key to `server/.env`:
 ```
 GOOGLE_API_KEY=your_key_here
 PORT=8080
 ```
 
-### Step 2 — Start the Backend
-```powershell
-cd "d:\LMS Hackathon\CogniPath\CogniPathLMS\server"
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python run.py
-# Backend running at http://localhost:8080
-```
+---
 
-### Step 3 — Start the Frontend
+### Run CogniPath Frontend (standalone demo only)
+
 ```powershell
 cd "d:\LMS Hackathon\CogniPath\CogniPathLMS\client"
 npm install
 npm run dev
-# Frontend running at http://localhost:5173
+# Runs at http://localhost:5173
 ```
 
-Open **http://localhost:5173** — you are auto-logged in as "Learner", no sign-in needed.
+> Note: The CogniPath frontend is a standalone demo of AI path generation.
+> The real integration target is Moodle — not this frontend.
 
 ---
 
-## Modules Status
+## Modules To Build (Moodle Integration)
 
-### DONE — Carried Over from CogniPath
-
-| Module | Description | Status |
-|---|---|---|
-| Firebase Removal | Replaced Firebase auth + Firestore with local auto-login + localStorage | ✅ Done |
-| AI Learning Path Generator | Gemini generates personalized curriculum from goal + level + uploaded files | ✅ Done |
-| Lesson Content Generator | Gemini writes full markdown lesson per module | ✅ Done |
-| Lesson Regeneration | Regenerate any lesson with user feedback | ✅ Done |
-| Socratic AI Tutor Chat | Context-aware chat per module using Socratic method | ✅ Done |
-| File Upload Context | PDF, DOCX, TXT files used to enrich AI-generated paths | ✅ Done |
-| Dashboard | Grid of user's saved learning paths | ✅ Done |
-| Module Viewer | Read lessons, navigate prev/next, progress bar | ✅ Done |
-| Persistent Storage | All paths, modules, chat messages saved to localStorage | ✅ Done |
-| Dark Mode | Theme toggle throughout app | ✅ Done |
-
----
-
-### TO BUILD — New Modules
-
-#### MODULE 1 — Quiz & Assessment System
+### MODULE 1 — AI Learning Path Generator Plugin
 **Priority: HIGH**
-- After each lesson, Gemini auto-generates 5 MCQ questions based on lesson content
-- User answers and gets instant scored results (0–100%)
-- Results stored in localStorage per module
-- Pass threshold: 70% — shows "Passed" or "Needs Review"
-- **Files to create:**
-  - `client/src/pages/Quiz.tsx`
-  - `client/src/components/features/Quiz/QuizCard.tsx`
-  - `client/src/components/features/Quiz/QuizResult.tsx`
-  - `server/app/routes/agent_routes.py` — add `/generate-quiz` endpoint
-  - `server/app/services/gemini_service.py` — add `generate_quiz()` function
+- Moodle plugin that calls the Flask `/api/generate-path` endpoint
+- Student enters their goal and skill level inside Moodle
+- AI returns a personalized sequence of existing Moodle courses/modules to follow
+- Saves the recommended path to the student's Moodle profile
+- **Type:** Moodle local plugin (`local_ai_pathgen`)
 - **Status:** Not started
 
 ---
 
-#### MODULE 2 — Progress Tracking & Analytics
+### MODULE 2 — Socratic AI Tutor Chat Block
 **Priority: HIGH**
-- Track per-module: completion status, quiz score, time spent, last accessed
-- Student dashboard shows: overall completion %, average quiz score, modules passed/failed
-- Visual progress ring/bar on dashboard cards
-- **Files to modify:**
-  - `client/src/types/gemini.ts` — extend `ModuleData` with `quizScore`, `timeSpent`, `completedAt`
-  - `client/src/pages/Dashboard.tsx` — add progress indicators
-  - `client/src/hooks/useGemini.ts` — add `getProgressSummary()` helper
-  - `client/src/components/features/ProgressRing.tsx` — new component
+- Moodle block added to any course page
+- Calls Flask `/api/chat` with the course's content as context
+- Uses Socratic method — guides students with questions instead of direct answers
+- Chat history persisted per student per course
+- **Type:** Moodle block plugin (`block_ai_tutor`)
 - **Status:** Not started
 
 ---
 
-#### MODULE 3 — Adaptive Difficulty Engine
+### MODULE 3 — AI Quiz Question Generator
 **Priority: HIGH**
-- After each quiz, system adjusts recommendations:
-  - Score < 50%: suggest reviewing current module again, slower pace
-  - Score 50–79%: proceed normally
-  - Score ≥ 80%: offer to skip ahead or go deeper
-- Inject quiz history into Gemini's lesson generation prompt for adaptive content
-- **Files to modify:**
-  - `server/app/services/gemini_service.py` — pass quiz performance context
-  - `server/app/prompts/system_prompts.py` — update prompts with adaptive instructions
-  - `client/src/pages/ModuleDetail.tsx` — show adaptive recommendation after quiz
+- Moodle plugin for teachers: select a lesson/topic → AI generates MCQ questions
+- Questions auto-imported into Moodle's native Quiz activity
+- Calls Flask `/api/generate-quiz` (new endpoint to build in Flask)
+- Teachers review and approve before publishing
+- **Type:** Moodle local plugin (`local_ai_quizgen`)
 - **Status:** Not started
 
 ---
 
-#### MODULE 4 — Instructor / Admin Dashboard
+### MODULE 4 — Adaptive Difficulty Engine
+**Priority: HIGH**
+- After a student completes a Moodle quiz, this plugin reads their score
+- Score < 60%: recommends review resources, flags to instructor
+- Score 60–79%: proceeds normally  
+- Score ≥ 80%: suggests advanced content or next module
+- AI-generated personalized tip shown to student after each quiz
+- **Type:** Moodle local plugin (`local_ai_adaptive`)
+- **Status:** Not started
+
+---
+
+### MODULE 5 — AI Progress Insights Dashboard (Instructor View)
 **Priority: MEDIUM**
-- Multiple learner profiles (add/switch learners in local mode)
-- Instructor sees: all learners, each learner's paths, progress, quiz scores
-- Flag struggling learners (< 60% average)
-- Exportable progress summary
-- **Files to create:**
-  - `client/src/pages/InstructorDashboard.tsx`
-  - `client/src/components/features/LearnerCard.tsx`
-  - `client/src/context/MultiUserContext.tsx` — manage multiple local profiles
+- New Moodle dashboard block for teachers/admins
+- Shows: class-wide progress, average scores, struggling students flagged
+- AI-generated insight: "3 students are struggling with Module 2 — consider adding a review session"
+- Calls Gemini with student performance data to generate natural-language insights
+- **Type:** Moodle block plugin (`block_ai_insights`)
 - **Status:** Not started
 
 ---
 
-#### MODULE 5 — Certificate of Completion
+### MODULE 6 — AtomCamp Course Templates
 **Priority: MEDIUM**
-- When all modules in a path have quiz score ≥ 70%, path is "completed"
-- Generate a printable certificate card with: learner name, path title, date, score
-- Download as PNG/PDF via browser print
-- **Files to create:**
-  - `client/src/pages/Certificate.tsx`
-  - `client/src/components/features/CertificateCard.tsx`
+- Pre-built Moodle course templates based on AtomCamp's real programs:
+  - AI & Machine Learning Bootcamp
+  - Web Development Bootcamp
+  - Data Science Bootcamp
+  - Cloud & DevOps Track
+- Importable as Moodle backup files (.mbz)
+- Each course has AI tutor block pre-installed
 - **Status:** Not started
 
 ---
 
-#### MODULE 6 — AtomCamp Course Catalog
-**Priority: MEDIUM**
-- Pre-built learning path templates based on AtomCamp's real programs (AI, Web Dev, etc.)
-- User can start from a template instead of typing a goal from scratch
-- Templates are editable/forkable
-- **Files to create:**
-  - `client/src/pages/Catalog.tsx`
-  - `client/src/data/atomcamp_templates.ts` — hardcoded AtomCamp program data
-- **Status:** Not started
-
----
-
-#### MODULE 7 — Enhanced AI Tutor (Moodle-Inspired)
+### MODULE 7 — AI Lesson Summarizer
 **Priority: LOW**
-- Forum-style Q&A: questions saved and searchable across sessions
-- Suggested follow-up questions after each AI response
-- Inline code execution hints (no sandbox, just show commands)
-- **Files to modify:**
-  - `client/src/components/features/ChatBot/` — add suggestions, Q&A log
+- Moodle block: student clicks "Summarize this lesson" button
+- Sends lesson page content to Flask → Gemini → returns bullet-point summary
+- Helps students review before quizzes
+- **Type:** Moodle block plugin (`block_ai_summarizer`)
 - **Status:** Not started
 
 ---
 
-## Data Model (localStorage)
+## What Moodle Already Provides (No Need to Build)
 
-```
-lms_paths          → Array of all saved paths (with userId, id, createdAt)
-lms_module_{userId}_{pathId}_{moduleId}  → Module data (content, status, quizScore, timeSpent)
-lms_msgs_{userId}_{pathId}_{moduleId}    → Chat messages array
-lms_quiz_{userId}_{pathId}_{moduleId}    → Quiz questions + user answers + score
-lms_learners       → Array of learner profiles (for instructor mode)
-```
+| Feature | Moodle Built-in |
+|---|---|
+| Course management | ✅ Native |
+| Student/Teacher/Admin roles | ✅ Native |
+| Quiz & grading engine | ✅ Native |
+| Gradebook & progress tracking | ✅ Native |
+| Discussion forums | ✅ Native |
+| Certificates of completion | ✅ Native plugin |
+| File uploads & media | ✅ Native |
+| Calendar & deadlines | ✅ Native |
+| Mobile-responsive UI | ✅ Native (Boost theme) |
+| Email notifications | ✅ Native |
+| Enrollment management | ✅ Native |
 
 ---
 
-## API Endpoints
+## API Endpoints (Flask AI Backend)
 
-| Method | Endpoint | Status |
-|---|---|---|
-| POST | `/api/generate-path` | ✅ Working |
-| POST | `/api/chat` | ✅ Working |
-| POST | `/api/generate-lesson` | ✅ Working |
-| POST | `/api/modules/:id/regenerate` | ✅ Working |
-| DELETE | `/api/paths/:id` | ✅ Working |
-| POST | `/api/generate-quiz` | 🔲 To Build |
+| Method | Endpoint | Status | Used By |
+|---|---|---|---|
+| POST | `/api/generate-path` | ✅ Working | MODULE 1 |
+| POST | `/api/chat` | ✅ Working | MODULE 2 |
+| POST | `/api/generate-lesson` | ✅ Working | MODULE 7 |
+| POST | `/api/modules/:id/regenerate` | ✅ Working | MODULE 2 |
+| DELETE | `/api/paths/:id` | ✅ Working | MODULE 1 |
+| POST | `/api/generate-quiz` | 🔲 To Build | MODULE 3 |
+| POST | `/api/adaptive-recommendation` | 🔲 To Build | MODULE 4 |
+| POST | `/api/progress-insights` | 🔲 To Build | MODULE 5 |
 
 ---
 
@@ -206,7 +238,8 @@ lms_learners       → Array of learner profiles (for instructor mode)
 | Date | Change |
 |---|---|
 | 2026-05-13 | Project initialized — CogniPath + Moodle imported |
-| 2026-05-13 | Firebase auth + Firestore removed — replaced with localStorage + local auto-login |
-| 2026-05-13 | Backend Firebase dependency removed — routes work without any DB |
-| 2026-05-13 | `.env` files created — only Gemini API key required to run |
+| 2026-05-13 | CogniPath: Firebase auth + Firestore removed — replaced with localStorage + local auto-login |
+| 2026-05-13 | CogniPath: Backend Firebase dependency removed — routes work without any DB |
 | 2026-05-13 | Full repo pushed to github.com/Tehman700/hackathonBahria |
+| 2026-05-13 | **Strategy updated: Moodle is now the main LMS. CogniPath AI features will be integrated into Moodle as plugins.** |
+| 2026-05-13 | Docker Compose setup created for Moodle 5.2 (PHP 8.2 + Apache + MySQL 8.0) |
