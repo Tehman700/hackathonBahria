@@ -8,7 +8,13 @@
       "Bash(Select-Object -First 10)",
       "PowerShell(\\(Get-ChildItem \"d:\\\\LMS Hackathon\" -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum\\).Sum / 1MB)",
       "PowerShell(cmd /c \"rd /s /q \"\"d:\\\\LMS Hackathon\\\\moodle_LMS\\\\moodle\\\\.git\"\"\")",
-      "PowerShell(if \\($LASTEXITCODE -eq 0\\) { \"Deleted\" } else { \"Failed - try closing VS Code file explorer on that folder\" })"
+      "PowerShell(if \\($LASTEXITCODE -eq 0\\) { \"Deleted\" } else { \"Failed - try closing VS Code file explorer on that folder\" })",
+      "PowerShell(cd \"d:\\\\LMS Hackathon\"; git status --short 2>&1 | Where-Object { $_ -match \"moodle\" } | Select-Object -First 3)",
+      "Bash(php --version)",
+      "PowerShell(php --version 2>&1)",
+      "PowerShell(if \\(-not $?\\) { \"PHP not found in PATH\" })",
+      "PowerShell(docker --version 2>&1)",
+      "PowerShell(docker-compose --version 2>&1)"
     ]
   }
 }
