@@ -4,7 +4,7 @@
 
 **Main LMS: Moodle 5.2** (the full-featured, production-grade LMS platform)
 
-**Secondary: CogniPath** (AI engine — selected features from it will be integrated INTO Moodle)
+**Secondary: CogniPath integrated modules** (AI backend components embedded into Moodle workflows, not a standalone product)
 
 ### Why Moodle as the core?
 Moodle already has everything a real LMS needs out of the box:
@@ -69,10 +69,9 @@ CogniPath brings the AI-adaptive layer that Moodle lacks. We are integrating the
 
 ### Run Moodle (Main LMS)
 
-```powershell
-cd "d:\LMS Hackathon\moodle_LMS"
-docker-compose build
-docker-compose up -d
+```bash
+cd /home/runner/work/hackathonBahria/hackathonBahria/moodle_LMS
+docker compose up -d --build
 ```
 
 Open **http://localhost:8090** → follow the install wizard.
@@ -88,13 +87,14 @@ Open **http://localhost:8090** → follow the install wizard.
 
 ---
 
-### Run CogniPath AI Backend (Flask API)
+### Run CogniPath AI Backend (Flask API module for Moodle)
 
-```powershell
-cd "d:\LMS Hackathon\CogniPath\CogniPathLMS\server"
-venv\Scripts\activate          # first time: python -m venv venv && pip install -r requirements.txt
+```bash
+cd /home/runner/work/hackathonBahria/hackathonBahria/CogniPath/CogniPathLMS/server
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 python run.py
-# Runs at http://localhost:8080
 ```
 
 Add your key to `server/.env`:
@@ -105,26 +105,12 @@ PORT=8080
 
 ---
 
-### Run CogniPath Frontend (standalone demo only)
-
-```powershell
-cd "d:\LMS Hackathon\CogniPath\CogniPathLMS\client"
-npm install
-npm run dev
-# Runs at http://localhost:5173
-```
-
-> Note: The CogniPath frontend is a standalone demo of AI path generation.
-> The real integration target is Moodle — not this frontend.
-
----
-
 ## Modules To Build (Moodle Integration)
 
 ### MODULE 1 — AI Learning Path Generator Plugin
 **Priority: HIGH**
 - Moodle plugin that calls the Flask `/api/generate-path` endpoint
-- Student enters their goal and skill level inside Moodle
+- Student onboarding survey at signup captures interests, goals, and current skills
 - AI returns a personalized sequence of existing Moodle courses/modules to follow
 - Saves the recommended path to the student's Moodle profile
 - **Type:** Moodle local plugin (`local_ai_pathgen`)
@@ -135,7 +121,7 @@ npm run dev
   - `moodle_LMS/moodle/public/local/ai_pathgen/locallib.php`
   - `moodle_LMS/moodle/public/local/ai_pathgen/db/install.xml`
   - `moodle_LMS/moodle/public/local/ai_pathgen/lib.php` + `settings.php` + language file
-- **Current behavior:** goal/skills form → mocked `/api/generate-path` logic → path persisted in plugin table + user preferences (`set_user_preference`)
+- **Current behavior:** signup survey + profile form (goal/interests/skills) → mocked `/api/generate-path` logic → path persisted in plugin table + user preferences (`set_user_preference`)
 
 ---
 
@@ -264,11 +250,12 @@ npm run dev
     - `local/ai_pathgen/db/install.xml`
     - `local/ai_quizgen/db/install.xml`
     - `blocks/ai_tutor/db/install.xml`
-- ⚠️ **Moodle Docker runtime install test blocked by existing environment issue**
-  - `docker compose up -d` failed in current repo image build because `xmlrpc` extension is requested in Dockerfile but unavailable in this PHP image (`/usr/src/php/ext/xmlrpc does not exist`).
-  - This is an environment/build issue outside these plugin scaffolding changes.
-- ✅ **Manual UI proof for this implementation batch captured**
-  - Screenshot summarizes the implemented UI flows for MODULE 1–3 with mock roundtrip behavior.
+- ⚠️ **Moodle CLI install test blocked by existing environment issue**
+  - `docker compose up -d --build` now starts containers successfully.
+  - CLI installer fails because Moodle 5.3dev in this repo requires MySQL `8.4`, while compose currently provisions `mysql:8.0`.
+  - This is an existing environment mismatch outside these feature changes.
+- ✅ **Manual UI proof for onboarding survey captured**
+  - Screenshot URL: `https://github.com/user-attachments/assets/52c89dc6-8cf5-481a-b95e-9dfd210f9342`
 
 ## New Technical/Design Decisions for Final Hackathon Push
 
@@ -291,3 +278,6 @@ npm run dev
 | 2026-05-13 | MODULE 2 scaffolded: `block_ai_tutor` block with per-course chat UI + mock API + history persistence |
 | 2026-05-13 | MODULE 3 scaffolded: `local_ai_quizgen` plugin with instructor UI + mock API + quiz import stub |
 | 2026-05-13 | Practical test run recorded: syntax/XML checks passed; Docker runtime install blocked by existing xmlrpc image issue |
+| 2026-05-13 | MODULE 1 updated with signup onboarding survey (interests, goals, skills) and automatic first-path seeding into personalization pipeline |
+| 2026-05-13 | CogniPath cleanup completed: removed standalone frontend, Firebase/deployment leftovers, and unused test/setup files; kept only Moodle-integrated backend modules |
+| 2026-05-13 | Documentation refreshed to present CogniPath as integrated Moodle feature modules and to add concise final run/functionality instructions |

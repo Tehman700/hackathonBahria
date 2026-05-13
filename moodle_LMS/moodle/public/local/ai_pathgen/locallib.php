@@ -29,15 +29,17 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @param string $goal
  * @param string $skills
+ * @param string $interests
  * @return array
  */
-function local_ai_pathgen_generate_path_mock(string $goal, string $skills): array {
+function local_ai_pathgen_generate_path_mock(string $goal, string $skills, string $interests = ''): array {
     $goaltext = trim($goal) !== '' ? trim($goal) : 'your selected target';
     $skilltext = trim($skills) !== '' ? trim($skills) : 'your current baseline';
+    $interesttext = trim($interests) !== '' ? trim($interests) : 'your stated interests';
 
     return [
         "Week 1: Foundations aligned to {$goaltext}",
-        "Week 2: Practice track based on {$skilltext}",
+        "Week 2: Practice track based on {$skilltext} with topics around {$interesttext}",
         'Week 3: Guided project sprint with Socratic tutor checkpoints',
         'Week 4: Quiz + reflection + adaptive next-step recommendations',
     ];
@@ -49,16 +51,18 @@ function local_ai_pathgen_generate_path_mock(string $goal, string $skills): arra
  * @param int $userid
  * @param string $goal
  * @param string $skills
+ * @param string $interests
  * @param array $pathitems
  * @return void
  */
-function local_ai_pathgen_save_generated_path(int $userid, string $goal, string $skills, array $pathitems): void {
+function local_ai_pathgen_save_generated_path(int $userid, string $goal, string $skills, string $interests, array $pathitems): void {
     global $DB;
 
     $now = time();
     $record = (object) [
         'userid' => $userid,
         'goal' => $goal,
+        'interests' => $interests,
         'skills' => $skills,
         'generatedpath' => json_encode(array_values($pathitems), JSON_UNESCAPED_UNICODE),
         'timecreated' => $now,
@@ -68,7 +72,7 @@ function local_ai_pathgen_save_generated_path(int $userid, string $goal, string 
     $DB->insert_record('local_ai_pathgen', $record);
 
     set_user_preference('local_ai_pathgen_goal', $goal, $userid);
+    set_user_preference('local_ai_pathgen_interests', $interests, $userid);
     set_user_preference('local_ai_pathgen_skills', $skills, $userid);
     set_user_preference('local_ai_pathgen_latest_path', $record->generatedpath, $userid);
 }
-
