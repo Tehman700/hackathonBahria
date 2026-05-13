@@ -14,7 +14,11 @@
       "PowerShell(php --version 2>&1)",
       "PowerShell(if \\(-not $?\\) { \"PHP not found in PATH\" })",
       "PowerShell(docker --version 2>&1)",
-      "PowerShell(docker-compose --version 2>&1)"
+      "PowerShell(docker-compose --version 2>&1)",
+      "PowerShell(docker exec moodle_lms-moodle-1 ls /var/www/html)",
+      "PowerShell(docker exec moodle_lms-moodle-1 ls /var/www/html/public/admin/cli/)",
+      "PowerShell(docker exec moodle_lms-moodle-1 ls /var/www/html/public/)",
+      "PowerShell(docker exec moodle_lms-moodle-1 ls /var/www/html/admin/cli/)"
     ]
   }
 }
